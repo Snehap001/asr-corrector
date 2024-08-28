@@ -31,6 +31,7 @@ class Agent(object):
         
         for i in range(0,len(words_list)):
             w=words_list[i]
+            print(w)
             for key,value in self.phoneme_table.items():
                 
 
@@ -40,6 +41,7 @@ class Agent(object):
                     lower_key=key.upper()
                     
                     new_string = orig.replace(lower_v,lower_key )
+                 
                     if(new_string!=orig ):
                         new_list=words_list
                         new_list[i]=new_string
@@ -55,13 +57,16 @@ class Agent(object):
         return init_cost,init_sentence
                             
 
-    def vocab(self,init_sentence,environment,vis_front,vis_back):
+    def vocab(self,init_sentence,environment):
         init_sentence=init_sentence.upper()
         orig_sentence=init_sentence
         words_list=init_sentence.split()
         init_cost=1e9
+        vis_front=0
+        vis_back=0
+
         for v in self.vocabulary:
-            if v not in vis_front:
+            if not(vis_front):
                 words_list=orig_sentence.split()
                 new_list=[v]
                 new_list=new_list+words_list
@@ -70,8 +75,8 @@ class Agent(object):
                 if cost<init_cost:
                     init_sentence=new_sentence
                     init_cost=cost
-                vis_front.append(v)
-            if v not in vis_back:
+                    vis_front=1
+            elif not(vis_back):
                 words_list=orig_sentence.split()
                 new_list=words_list
                 new_list.append(v)
@@ -80,7 +85,36 @@ class Agent(object):
                 if cost<init_cost:
                     init_sentence=new_sentence
                     init_cost=cost
-                vis_back.append(v)
+                    vis_back=1
+        vis_front=0
+        vis_back=0
+        for v in self.vocabulary:
+            if not(vis_front):
+                words_list=orig_sentence.split()
+                new_list=[v]
+                new_list=new_list+words_list
+                new_sentence=' '.join(new_list)
+                cost=environment.compute_cost(new_sentence)
+                if cost<init_cost:
+                    init_sentence=new_sentence
+                    init_cost=cost
+                    vis_front=1
+        vis_front=0
+        vis_back=0
+        for v in self.vocabulary:
+            
+            if not(vis_back):
+                words_list=orig_sentence.split()
+                new_list=words_list
+                new_list.append(v)
+                new_sentence=' '.join(new_list)
+                cost=environment.compute_cost(new_sentence)
+                if cost<init_cost:
+                    init_sentence=new_sentence
+                    init_cost=cost
+                    vis_back=1
+        
+
         return init_cost,init_sentence
 
 
@@ -102,14 +136,17 @@ class Agent(object):
         i=10
         changed_sentence=self.best_state
         print(self.best_state)
+        
         print(cost)
         new_cost=0
         temperature=1000
         cooling_rate=0.8
-        max_iterations=10000
+        max_iterations=10
         while(max_iterations>0):
             # prev_sentence=self.best_state
+
             new_cost,changed_sentence=self.sound_similar(changed_sentence,environment)
+            print(changed_sentence,new_cost)
             delta_value=new_cost-cost
             if new_cost<cost or random.uniform(0, 1) < math.exp(-delta_value / temperature):
                 cost=new_cost
@@ -119,17 +156,14 @@ class Agent(object):
             max_iterations-=1
         new_cost=0
        
-        prev_sentence=""
         changed_sentence=self.best_state
-        # vis_front=[]
-        # vis_back=[]
-        # while(prev_sentence!=self.best_state):
-        #     prev_sentence=self.best_state
-        #     new_cost,changed_sentence=self.vocab(changed_sentence,environment,vis_front,vis_back)
-        #     # print(new_cost," ",changed_sentence)
-        #     if(new_cost<cost):
-        #         self.best_state=changed_sentence
-        #         environment.best_state=changed_sentence
+       
+        
+        new_cost,changed_sentence=self.vocab(changed_sentence,environment)
+        # print(new_cost," ",changed_sentence)
+        if(new_cost<cost):
+            self.best_state=changed_sentence
+            environment.best_state=changed_sentence
 
         print(self.best_state)
 
