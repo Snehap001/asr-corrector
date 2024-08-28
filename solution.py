@@ -136,17 +136,17 @@ class Agent(object):
         i=10
         changed_sentence=self.best_state
         print(self.best_state)
-        
-        print(cost)
+        c=environment.compute_cost(changed_sentence)
+        print(c)
         new_cost=0
         temperature=1000
         cooling_rate=0.8
-        max_iterations=10
+        max_iterations=100
         while(max_iterations>0):
             # prev_sentence=self.best_state
 
             new_cost,changed_sentence=self.sound_similar(changed_sentence,environment)
-            print(changed_sentence,new_cost)
+            
             delta_value=new_cost-cost
             if new_cost<cost or random.uniform(0, 1) < math.exp(-delta_value / temperature):
                 cost=new_cost
