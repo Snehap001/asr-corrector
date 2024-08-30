@@ -125,9 +125,9 @@ class Agent(object):
         while(max_iterations>0):
             new_cost,changed_sentence=self.sound_similar(changed_sentence,environment)
             if new_cost<cost :
-                print(changed_sentence)
-                print(new_cost)
-                print(10-max_iterations)
+                # print(changed_sentence)
+                # print(new_cost)
+                # print(10-max_iterations)
                 cost=new_cost
                 self.best_state=changed_sentence
                 environment.best_state=changed_sentence
@@ -138,5 +138,6 @@ class Agent(object):
         if(new_cost<cost):
             self.best_state=changed_sentence
             environment.best_state=changed_sentence
+        print(environment.best_state)
 
     
