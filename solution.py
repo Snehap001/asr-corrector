@@ -50,67 +50,40 @@ class Agent(object):
     def vocab(self,init_sentence,environment):
         init_sentence=init_sentence.upper()
         orig_sentence=init_sentence
-        words_list=init_sentence.split()
         init_cost=1e9
-        vis_front=0
-        vis_back=0
-
+        vis_first=False
+        vis_last=False
         for v in self.vocabulary:
-            if not(vis_front):
-                words_list=orig_sentence.split()
-                new_list=[v]
-                new_list=new_list+words_list
-                new_sentence=' '.join(new_list)
-                cost=environment.compute_cost(new_sentence)
+            new_sentence=v+ ' '+orig_sentence  
+            cost=environment.compute_cost(new_sentence)
+            if cost<init_cost:
+                init_sentence=new_sentence
+                init_cost=cost  
+                vis_first=True
+                vis_last=False 
+            new_sentence=orig_sentence+' '+v
+            cost=environment.compute_cost(new_sentence)
+            if cost<init_cost:
+                init_sentence=new_sentence
+                init_cost=cost    
+                vis_first=False
+                vis_last=True
+        orig_sentence=init_sentence 
+        if(vis_first):
+            for v in self.vocabulary:
+                new_sentence=orig_sentence+' '+v  
+                cost=environment.compute_cost(new_sentence)  
                 if cost<init_cost:
                     init_sentence=new_sentence
-                    init_cost=cost
-                    vis_front=1
-            elif not(vis_back):
-                words_list=orig_sentence.split()
-                new_list=words_list
-                new_list.append(v)
-                new_sentence=' '.join(new_list)
-                cost=environment.compute_cost(new_sentence)
+                    init_cost=cost       
+        elif(vis_last):
+            for v in self.vocabulary:
+                new_sentence=v+' '+orig_sentence 
+                cost=environment.compute_cost(new_sentence)  
                 if cost<init_cost:
                     init_sentence=new_sentence
-                    init_cost=cost
-                    vis_back=1
-        vis_front=0
-        vis_back=0
-        for v in self.vocabulary:
-            if not(vis_front):
-                words_list=orig_sentence.split()
-                new_list=[v]
-                new_list=new_list+words_list
-                new_sentence=' '.join(new_list)
-                cost=environment.compute_cost(new_sentence)
-                if cost<init_cost:
-                    init_sentence=new_sentence
-                    init_cost=cost
-                    vis_front=1
-        vis_front=0
-        vis_back=0
-        for v in self.vocabulary:
-            
-            if not(vis_back):
-                words_list=orig_sentence.split()
-                new_list=words_list
-                new_list.append(v)
-                new_sentence=' '.join(new_list)
-                cost=environment.compute_cost(new_sentence)
-                if cost<init_cost:
-                    init_sentence=new_sentence
-                    init_cost=cost
-                    vis_back=1
-        
-
-        return init_cost,init_sentence
-
-
-    
-
-    def asr_corrector(self, environment):
+                    init_cost=cost    
+        return init_cost,init_sentence    def asr_corrector(self, environment):
         """
         Your ASR corrector agent goes here. Environment object has following important members.
         - environment.init_state: Initial state of the environment. This is the text that needs to be corrected.
