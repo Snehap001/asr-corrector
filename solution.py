@@ -1,7 +1,3 @@
-
-import random
-import math
-import json
 class Agent(object):
     def __init__(self, phoneme_table, vocabulary) -> None:
         """
@@ -20,7 +16,7 @@ class Agent(object):
     def sound_similar(self,init_sentence,environment):       
         init_sentence=init_sentence.upper()
         orig_sentence=init_sentence
-        init_cost=1e9  
+        init_cost=1e9
         length=len(orig_sentence)
         substr_len=1
         for i in range (0,length):
@@ -50,7 +46,7 @@ class Agent(object):
     def vocab(self,init_sentence,environment):
         init_sentence=init_sentence.upper()
         orig_sentence=init_sentence
-        init_cost=1e9
+        init_cost=environment.compute_cost(orig_sentence)
         vis_first=False
         vis_last=False
         for v in self.vocabulary:
@@ -83,27 +79,28 @@ class Agent(object):
                 if cost<init_cost:
                     init_sentence=new_sentence
                     init_cost=cost    
-        return init_cost,init_sentence    def asr_corrector(self, environment):
+        return init_cost,init_sentence
+    def asr_corrector(self, environment):
         """
         Your ASR corrector agent goes here. Environment object has following important members.
         - environment.init_state: Initial state of the environment. This is the text that needs to be corrected.
         - environment.compute_cost: A cost function that takes a text and returns a cost. E.g., environment.compute_cost("hello") -> 0.5
         Your agent must update environment.best_state with the corrected text discovered so far.
         """
+        #execute vocab before sound_similar
         self.best_state = environment.init_state
-        cost = 1e9
         changed_sentence=self.best_state
+        cost=environment.compute_cost(changed_sentence)
         new_cost=0
-        max_iterations=9
+        max_iterations=1e9
         while(max_iterations>0):
             new_cost,changed_sentence=self.sound_similar(changed_sentence,environment)
             if new_cost<cost :
-                # print(changed_sentence)
-                # print(new_cost)
-                # print(10-max_iterations)
                 cost=new_cost
                 self.best_state=changed_sentence
                 environment.best_state=changed_sentence
+            else:
+                break
             max_iterations-=1
         new_cost=0 
         changed_sentence=self.best_state
@@ -111,6 +108,4 @@ class Agent(object):
         if(new_cost<cost):
             self.best_state=changed_sentence
             environment.best_state=changed_sentence
-        print(environment.best_state)
-
-    
+        print(changed_sentence)
