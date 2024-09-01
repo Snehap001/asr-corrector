@@ -108,4 +108,4 @@ class Agent(object):
         if(new_cost<cost):
             self.best_state=changed_sentence
             environment.best_state=changed_sentence
-        print(changed_sentence)
+        
