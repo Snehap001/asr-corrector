@@ -1,0 +1,18 @@
+Contributors: Sneha Pareek(2022CS11096), Talgaonkar Aarya Sanjay (2022CS51646)
+
+An agent designed to correct Automatic Speech Recognition (ASR) errors.
+
+Abstract
+ASR systems convert audio received from a human speaking to the device to the corresponding text. However, ASR systems can make errors. Two kinds of errors have been considered in this study. Incorrect recognition of similar sounding characters and missing out on complete words in the beginning and end have been targeted. A local search algorithm has been devised. After testing, 97.18% accuracy was observed on the given dataset and with the given Whisper cost function.
+
+Core Idea
+We implemented two functions, sound_similar and vocab, to perform phoneme-based and vocabulary-based corrections, respectively. The approach utilizes a local search algorithm that moves to the best neighbouring state at each step. The vocabulary-based correction is applied after the phoneme-based correction to ensure that the cost function computes the optimal value when inserting words at the beginning or end of the sentence.
+
+Algorithm Explanation
+•	Reversing the Phoneme Table: We reverse the phoneme table to easily replace a phoneme with its corresponding key value.
+•	Phoneme-based Correction (sound_similar() function): For each sentence, we iterate over all possible phonemes of lengths 1 and 2. If a phoneme is present in the phoneme table, we calculate the cost of the new sentence after replacing it. If the new cost is lower than the previous cost, we update both the cost and the sentence. It thus calculates and returns the minimum cost neighbouring state.
+•	Vocabulary-based Correction (vocab() function): We test all possible combinations of word insertions—either at the beginning, the end, or both. The combination with the lowest cost becomes the final result if it is less than the cost obtained from the sound_similar function.
+•	Iteration Control: We use a variable max_iterations to ensure that the sound_similar function continues to run until no further improvement is found (i.e., the new cost is not lower than the previous cost), indicating that we have reached a global minimum solution so far as the spelling mistakes are concerned. Then we run the vocab() function on this to insert the missing words.
+
+Why choose Local Search?
+Local search enabled us to move toward a better state at each step. We also tried implementing simulated annealing, but it did not improve the solution for this particular agent. The reason was that after reaching the optimal value, simulated annealing could potentially move the solution back to a suboptimal state. Additionally, since the goal state is not fixed, we couldn't set a maximum number of iterations to continue searching. With simulated annealing, further searches after reaching the optimal solution could continue endlessly, whereas local search reliably converges to the optimal solution without risking unnecessary backtracking.
