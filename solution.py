@@ -16,7 +16,7 @@ class Agent(object):
     def sound_similar(self,init_sentence,environment):       
         init_sentence=init_sentence.upper()
         orig_sentence=init_sentence
-        init_cost=environment.compute_cost(orig_sentence)
+        init_cost=1e9
         length=len(orig_sentence)
         substr_len=1
         for i in range (0,length):
@@ -92,13 +92,15 @@ class Agent(object):
         changed_sentence=self.best_state
         cost=environment.compute_cost(changed_sentence)
         new_cost=0
-        max_iterations=8
+        max_iterations=1e9
         while(max_iterations>0):
             new_cost,changed_sentence=self.sound_similar(changed_sentence,environment)
             if new_cost<cost :
                 cost=new_cost
                 self.best_state=changed_sentence
                 environment.best_state=changed_sentence
+            else:
+                break
             max_iterations-=1
         new_cost=0 
         changed_sentence=self.best_state
@@ -106,3 +108,4 @@ class Agent(object):
         if(new_cost<cost):
             self.best_state=changed_sentence
             environment.best_state=changed_sentence
+        print(changed_sentence)
